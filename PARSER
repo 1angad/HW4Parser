@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 void statement(void);
-void statementList(void);
+void stList(void);
 void whileLoop(void);
 void ifSt(void);
 void block(void);
@@ -285,7 +285,7 @@ void statement(void){
   }
 }
 
-void statementList(void){
+void stList(void){
     //5 points | <STMT_LIST> --> { <STMT> `;` }
   if(nextToken != LCURL){
     error();
@@ -352,7 +352,7 @@ void block(void){//10 points | <BLOCK> --> `{` <STMT_LIST> `}`
     error();
   } else{
     lexer();
-    statementList();
+    stList();
     if(nextToken != RCURL){
       error();
     }
