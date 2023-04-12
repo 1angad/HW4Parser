@@ -1,0 +1,449 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+
+void statement(void);
+void statementList(void);
+void whileLoop(void);
+void ifSt(void);
+void block(void);
+void expr(void);
+void term(void);
+void factor(void);
+void bExpr(void);
+void bTerm(void);
+void bAnd(void);
+void bOr(void);
+void error(void);
+void addChar(void);
+void getChar(void);
+int lexer(void);
+
+int characterClass;
+char lexeme[100];
+char nextCharacter;
+int lexemeLength;
+int currentToken;
+int nextToken;
+FILE *file_pointer;
+
+// 30 POINT | TOKENIZE THE TERMINALS, WRITING GOOD CODE IN OBJECT ORIENTED FASHIONED THAT TAKES IN LIST OF TOKENS
+
+
+#define VAR_ID 1
+#define INT_LIT 2
+#define FLOAT_LIT 3
+#define LETTER 4
+#define NUMBER 5
+#define SPECIAL 6
+#define ASSIGN 7
+#define NOT_EQUALS 8      
+#define EQUALS 9        
+#define LT 10
+#define LTE 11
+#define GT 12
+#define GTE 13
+#define AND 14
+#define OR 15
+#define LCURL 16
+#define RCURL 17
+#define SEMICOLON 18
+#define IF_CODE 19
+#define ELSE_CODE 20
+#define WHILE_CODE 21
+#define NOT 22
+#define ADD 23
+#define SUB 24
+#define MUL 25
+#define DIV 26
+#define MOD 27
+#define LPAR 28
+#define RPAR 29
+#define STOP 30
+
+void error(void){
+	printf("ERROR");
+  exit(0);
+}
+
+int glossary(char ch){
+  switch(ch){
+    case '(':
+       addChar();
+       nextToken = LPAR;
+       break;
+    case ')':
+       addChar();
+       nextToken = RPAR;
+       break;
+    case '+':
+       addChar();
+       nextToken = ADD;
+       break;
+    case '-':
+       addChar();
+       nextToken = SUB;
+       break;
+    case '*':
+       addChar();
+       nextToken = MUL;
+       break;
+    case '/':
+       addChar();
+       nextToken = DIV;
+       break;
+    case '%':
+       addChar();
+       nextToken = MOD;
+       break;
+    case '.':
+       addChar();
+       nextToken = STOP;
+       break;
+    case '!':
+       addChar();
+       nextToken = NOT;
+       break;
+    case '=':
+       addChar();
+       nextToken = EQUALS;
+       break;
+    case '<':
+       addChar();
+       nextToken = LT;
+       break;
+    case '>':
+       addChar();
+       nextToken = GT;
+       break;
+    case '&':
+       addChar();
+       nextToken = AND;
+       break;
+    case '|':
+       addChar();
+       nextToken = OR;
+       break;
+    case '{':
+       addChar();
+       nextToken = LCURL;
+       break;
+    case '}':
+       addChar();
+       nextToken = RCURL;
+       break;
+    case ';':
+       addChar();
+       nextToken = SEMICOLON;
+       break;
+    default:
+       addChar();
+       nextToken = EOF;
+       break;
+  }
+  return nextToken;
+}
+
+void addChar(void){
+  if(lexemeLength <= 90){
+    lexeme[lexemeLength++] = nextCharacter;
+    lexeme[lexemeLength] = '\0';
+  } else{
+    printf("ERROR\n");
+  }
+}
+
+void getChar(void){
+  if((nextCharacter = getc(file_pointer)) != EOF){
+    if(isalpha(nextCharacter)){
+      characterClass = LETTER;
+    } else if(isdigit(nextCharacter)){
+      characterClass = NUMBER;
+    } else{
+      characterClass = SPECIAL;
+    } 
+  } else{
+      characterClass = EOF;
+    }
+}
+
+void noBlank(void){
+  while(isspace(nextCharacter)){
+    getChar();
+  }
+}
+
+int num;
+int lexer(void){
+  lexemeLength = 0;
+  noBlank();
+  int num;
+  switch(characterClass){
+    case LETTER:
+       addChar();
+       getChar();
+       while(characterClass == LETTER || characterClass == NUMBER){
+         addChar();
+         getChar();
+       }
+       nextToken = VAR_ID;
+       break;
+    case NUMBER:
+       addChar();
+       getChar();
+       while(characterClass == NUMBER){
+         addChar();
+         getChar();
+       }
+       if(nextCharacter != '.'){
+       nextToken = INT_LIT;
+       } else{
+         addChar();
+         getChar();
+         while(characterClass == NUMBER){
+           addChar();
+           getChar();
+         }
+         if(nextCharacter == 'd' || nextCharacter == 'f'){
+           addChar();
+           getChar();
+         }
+         nextToken = FLOAT_LIT;
+       }
+       break;
+    case SPECIAL:
+      if(nextCharacter == "."){
+        addChar();
+        getChar();
+        if(characterClass == NUMBER){
+          while(characterClass == NUMBER){
+            addChar();
+            getChar();
+          }
+          if(nextCharacter == 'd' || nextCharacter == 'f'){
+            addChar();
+            getChar();
+          }
+          nextToken = FLOAT_LIT;
+        }
+        nextToken = STOP;
+      } else{
+       glossary(nextCharacter);
+       getChar();
+       if(nextToken == LT && nextCharacter == '='){
+         addChar();
+         getChar();
+         nextToken = LTE;
+       } else if(nextToken == GT && nextCharacter == '='){
+         addChar();
+         getChar();
+         nextToken = GTE;
+       } else if(nextToken == EQUALS && nextCharacter == '='){
+         addChar();
+         getChar();
+         nextToken = ASSIGN;
+       } else if(nextToken == NOT && nextCharacter == '='){
+         addChar();
+         getChar();
+         nextToken = NOT_EQUALS;
+         } else if(nextToken == AND && nextCharacter == '&'){
+         addChar();
+         getChar();
+         nextToken = AND;
+       } else if(nextToken == OR && nextCharacter == '|'){
+         addChar();
+         getChar();
+         nextToken = OR;
+       }
+      }
+       break;
+    case EOF:
+       nextToken = EOF;
+       lexeme[0] = 'E';
+       lexeme[1] = 'O';
+       lexeme[2] = 'F';
+       lexeme[3] = '\0';
+       break;
+  }
+  printf("Next lexeme: %s\n", lexeme);
+  return nextToken;
+}
+/*--------------------------------------------------------------------------------------*/
+void statement(void){
+    // 10 points | <STMT> --> <IF_STMT> | <BLOCK> | <EXPR> | <WHILE_LOOP>
+  if(nextToken != WHILE_CODE){
+    whileLoop();
+  } else if(nextToken != IF_CODE){
+    ifSt();
+  } else if(nextToken != LCURL){
+    block();
+  } else if(nextToken != VAR_ID || nextToken != INT_LIT || nextToken != LPAR){
+    expr();
+  } else{
+    error();
+  }
+}
+
+void statementList(void){
+    //5 points | <STMT_LIST> --> { <STMT> `;` }
+  if(nextToken != LCURL){
+    error();
+  } else{
+    lexer();
+    statement();
+    if(nextToken != SEMICOLON){
+      error();
+    } else{
+      lexer();
+      if(nextToken != RCURL){
+        error();
+      }
+    } 
+  }
+}
+
+//5 points | <WHILE_LOOP> --> `while` `(` <BOOL_EXPR> `)` ( <STMT> `;` | <BLOCK> )
+void whileLoop (void){
+  if(nextToken != WHILE_CODE){
+    error();
+  } else{
+    lexer();
+    if(nextToken != LPAR){
+      error();
+    } else{
+      lexer();
+      bExpr();
+      if(nextToken != RPAR){
+        error();
+      }
+    }
+  }
+}
+
+void ifSt(void){
+    //10 points | <IF_STMT> --> `if` `(` <BOOL_EXPR> `)` ( <STMT> `;` | <BLOCK> ) [ `else` ( <STMT> `;` | <BLOCK> )] 
+  if(nextToken != IF_CODE){
+    error();
+  } else{
+     lexer();
+     if(nextToken != LPAR){
+       error();
+     } else{
+       lexer();
+       bExpr();
+       if(nextToken != RPAR){
+         error();
+       } else{
+         lexer();
+         statement();
+         if(nextToken != ELSE_CODE){
+           lexer();
+           statement();
+         }
+       }
+     }
+  }    
+}
+
+void block(void){//10 points | <BLOCK> --> `{` <STMT_LIST> `}`
+
+  if(nextToken != LCURL){
+    error();
+  } else{
+    lexer();
+    statementList();
+    if(nextToken != RCURL){
+      error();
+    }
+  }
+}
+
+void expr(void){ //15 points |<EXPR> --> <TERM> {(`+`|`-`) <TERM>}
+
+  term();
+  while(nextToken == ADD || nextToken == SUB){
+    lexer();
+    term();
+  }
+  printf("VALID\n");
+}
+
+void term(void){ //           <TERM> --> <FACT> {(`*`|`/`|`%`) <FACT>}
+
+  factor();
+  while(nextToken == MUL || nextToken == DIV || nextToken == MOD){
+    lexer();
+    factor();
+  }
+}
+
+void factor(void){ //           <FACT> --> ID | INT_LIT | FLOAT_LIT | `(` <EXPR> `)`
+
+  if (nextToken == VAR_ID || nextToken == INT_LIT){
+    lexer();
+  } else if(nextToken == LPAR){
+    lexer();
+    expr();
+    if(nextToken == RPAR){
+      lexer();
+    } else{error();}
+    }
+  }
+
+void bExpr(void){ //15 points |<BOOL_EXPR> --> <BTERM> {(`>`|`<`|`>=`|`<=`) <BTERM>}
+
+  printf("Enter <bool_expr>\n");
+  bTerm();
+  while(nextToken == GT || nextToken == LT || nextToken == GTE || nextToken == LTE){
+    lexer();
+    bTerm();
+  }
+  printf("Exit <bool_expr>\n");
+}
+
+void bTerm(void){ //           <BTERM> --> <BAND> {(`==`|`!=`) <BAND>}
+
+  printf("Enter <bterm>");
+  bAnd();
+  while(nextToken == ASSIGN || nextToken == NOT_EQUALS){
+    lexer();
+    bAnd();
+  }
+  printf("Exit <bterm>");
+}
+
+void bAnd(void){ //           <BAND> --> <BOR> {`&&` <BOR>}
+
+  printf("Enter <band>");
+  bOr();
+  while(nextToken == AND){
+    lexer();
+    bOr();
+  }
+  printf("Exit <band>");
+}
+
+void bOr(void){ //           <BOR> --> <EXPR> {`&&` <EXPR>}
+
+  printf("Enter <bor>");
+  expr();
+  while(nextToken == OR){
+    lexer();
+    expr();
+  }
+  printf("Exit <bor>");
+}
+
+int main(void) {
+  if ((file_pointer = fopen("test.txt", "r")) == NULL){
+    printf("ERROR file cannot open\n");
+  } else{
+   getChar(); 
+  } 
+  while(nextToken != EOF) {  
+    lexer();
+    expr();
+  }
+  return 0;
+}
