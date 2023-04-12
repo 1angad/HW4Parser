@@ -437,7 +437,7 @@ void bOr(void){ //           <BOR> --> <EXPR> {`&&` <EXPR>}
 
 int main(void) {
   if ((file_pointer = fopen("test.txt", "r")) == NULL){
-    printf("ERROR file cannot open\n");
+    printf("ERROR\n");
   } else{
    getChar(); 
   } 
