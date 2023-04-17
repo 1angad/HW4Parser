@@ -29,125 +29,108 @@ int nextToken;
 FILE *file_pointer;
 
 // 30 POINT | TOKENIZE THE TERMINALS, WRITING GOOD CODE IN OBJECT ORIENTED FASHIONED THAT TAKES IN LIST OF TOKENS
+typedef enum {
+    ADD, SUB, MUL, DIV, MOD, LPAR, RPAR, ASSIGN, EQUALS, LTE, GTE, GT, LT, AND, OR, IDENTIFIER, INT_LIT, FLOAT_LIT, INVALID, STOP, VAR_ID, LETTER, NUMBER, SPECIAL, SEMICOLON, IF_CODE, ELSE_CODE, WHILE_CODE, NOT, LCURL, RCURL, NOT_EQUALS
+} TokenType;
 
+typedef struct {
+    TokenType type;
+} Token;
 
-#define VAR_ID 1
-#define INT_LIT 2
-#define FLOAT_LIT 3
-#define LETTER 4
-#define NUMBER 5
-#define SPECIAL 6
-#define ASSIGN 7
-#define NOT_EQUALS 8      
-#define EQUALS 9        
-#define LT 10
-#define LTE 11
-#define GT 12
-#define GTE 13
-#define AND 14
-#define OR 15
-#define LCURL 16
-#define RCURL 17
-#define SEMICOLON 18
-#define IF_CODE 19
-#define ELSE_CODE 20
-#define WHILE_CODE 21
-#define NOT 22
-#define ADD 23
-#define SUB 24
-#define MUL 25
-#define DIV 26
-#define MOD 27
-#define LPAR 28
-#define RPAR 29
-#define STOP 30
-
-void error(void){
-	printf("ERROR");
-  exit(0);
-}
-
-int glossary(char ch){
-  switch(ch){
-    case '(':
+int tokens(char ch){
+    if (ch == '(') {
        addChar();
        nextToken = LPAR;
-       break;
-    case ')':
+       return nextToken;
+    }
+    if (ch == ')'){
        addChar();
        nextToken = RPAR;
-       break;
-    case '+':
+       return nextToken;
+    }
+    if (ch == '+'){
        addChar();
        nextToken = ADD;
-       break;
-    case '-':
+       return nextToken;
+    }
+      if (ch == '-'){
        addChar();
        nextToken = SUB;
-       break;
-    case '*':
+       return nextToken;
+    }
+      if (ch == '*'){
        addChar();
        nextToken = MUL;
-       break;
-    case '/':
+       return nextToken;
+      }
+    if (ch == '/'){
        addChar();
        nextToken = DIV;
-       break;
-    case '%':
+       return nextToken;
+    }
+      if (ch == '%'){
        addChar();
        nextToken = MOD;
-       break;
-    case '.':
+       return nextToken;
+    }
+    if (ch == '.'){
        addChar();
        nextToken = STOP;
-       break;
-    case '!':
+       return nextToken;
+    }
+      if (ch == '!'){
        addChar();
        nextToken = NOT;
-       break;
-    case '=':
+       return nextToken;
+    }
+      if (ch == '='){
        addChar();
        nextToken = EQUALS;
-       break;
-    case '<':
+       return nextToken;
+    }
+      if (ch == '<'){
        addChar();
        nextToken = LT;
-       break;
-    case '>':
+       return nextToken;
+    }
+      if (ch == '>'){
        addChar();
        nextToken = GT;
-       break;
-    case '&':
+       return nextToken;
+    }
+      if (ch == '&'){
        addChar();
        nextToken = AND;
-       break;
-    case '|':
+       return nextToken;
+    }
+      if (ch == '|'){
        addChar();
        nextToken = OR;
-       break;
-    case '{':
+       return nextToken;
+    }
+      if (ch == '{'){
        addChar();
        nextToken = LCURL;
-       break;
-    case '}':
+       return nextToken;
+    }
+      if (ch == '}'){
        addChar();
        nextToken = RCURL;
-       break;
-    case ';':
+       return nextToken;
+    }
+      if (ch == ';'){
        addChar();
        nextToken = SEMICOLON;
-       break;
-    default:
+       return nextToken;
+    }
        addChar();
        nextToken = EOF;
-       break;
-  }
   return nextToken;
 }
 
 void addChar(void){
   if(lexemeLength <= 90){
-    lexeme[lexemeLength++] = nextCharacter;
+    lexeme[lexemeLength + 1] = nextCharacter;
     lexeme[lexemeLength] = '\0';
   } else{
     printf("ERROR\n");
@@ -229,7 +212,7 @@ int lexer(void){
         }
         nextToken = STOP;
       } else{
-       glossary(nextCharacter);
+       tokens(nextCharacter);
        getChar();
        if(nextToken == LT && nextCharacter == '='){
          addChar();
@@ -260,6 +243,7 @@ int lexer(void){
        break;
     case EOF:
        nextToken = EOF;
+      
        lexeme[0] = 'E';
        lexeme[1] = 'O';
        lexeme[2] = 'F';
@@ -269,7 +253,7 @@ int lexer(void){
   printf("Next lexeme: %s\n", lexeme);
   return nextToken;
 }
-/*--------------------------------------------------------------------------------------*/
+
 void statement(void){
     // 10 points | <STMT> --> <IF_STMT> | <BLOCK> | <EXPR> | <WHILE_LOOP>
   if(nextToken != WHILE_CODE){
@@ -387,9 +371,11 @@ void factor(void){ //           <FACT> --> ID | INT_LIT | FLOAT_LIT | `(` <EXPR>
     expr();
     if(nextToken == RPAR){
       lexer();
-    } else{error();}
+    } else {
+      error();
     }
   }
+}
 
 void bExpr(void){ //15 points |<BOOL_EXPR> --> <BTERM> {(`>`|`<`|`>=`|`<=`) <BTERM>}
 
@@ -433,6 +419,11 @@ void bOr(void){ //           <BOR> --> <EXPR> {`&&` <EXPR>}
     expr();
   }
   printf("Exit <bor>");
+}
+
+void error(void){
+	printf("ERROR");
+  exit(0);
 }
 
 int main(void) {
