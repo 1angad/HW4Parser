@@ -20,6 +20,7 @@ void addChar(void);
 void getChar(void);
 int lexer(void);
 
+int counter;
 int characterClass;
 char lexeme[100];
 char nextCharacter;
@@ -250,7 +251,9 @@ int lexer(void){
        lexeme[3] = '\0';
        break;
   }
+  counter++;
   printf("Next lexeme: %s\n", lexeme);
+  printf("Count: %d\n", counter);
   return nextToken;
 }
 
